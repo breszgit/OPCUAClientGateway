@@ -141,6 +141,7 @@ namespace NetCoreConsoleClient
             string JSConfig = File.ReadAllText(Path.Combine(Environment.CurrentDirectory, "appsettings.json"));
             AppConfig = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(JSConfig);
             CorNo = AppConfig.OPC.CorID;
+            ApiURL = AppConfig.OnboardTablet.Server;
         }
 
         public void Run()
