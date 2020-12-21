@@ -1,0 +1,10 @@
+D:\TestCode\OPCUA_Core\bin\Debug\netcoreapp2.1\ConsoleApp1.deps.json
+D:\TestCode\OPCUA_Core\bin\Debug\netcoreapp2.1\ConsoleApp1.runtimeconfig.json
+D:\TestCode\OPCUA_Core\bin\Debug\netcoreapp2.1\ConsoleApp1.runtimeconfig.dev.json
+D:\TestCode\OPCUA_Core\bin\Debug\netcoreapp2.1\ConsoleApp1.dll
+D:\TestCode\OPCUA_Core\bin\Debug\netcoreapp2.1\ConsoleApp1.pdb
+D:\TestCode\OPCUA_Core\obj\Debug\netcoreapp2.1\ConsoleApp1.csprojAssemblyReference.cache
+D:\TestCode\OPCUA_Core\obj\Debug\netcoreapp2.1\ConsoleApp1.AssemblyInfoInputs.cache
+D:\TestCode\OPCUA_Core\obj\Debug\netcoreapp2.1\ConsoleApp1.AssemblyInfo.cs
+D:\TestCode\OPCUA_Core\obj\Debug\netcoreapp2.1\ConsoleApp1.dll
+D:\TestCode\OPCUA_Core\obj\Debug\netcoreapp2.1\ConsoleApp1.pdb
