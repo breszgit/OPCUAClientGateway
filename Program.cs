@@ -296,47 +296,47 @@ namespace NetCoreConsoleClient
                 //GL
                 new MonitoredItem()
                 {
-                    DisplayName = "C2_DF_IEM_Liner_Rem_Current", StartNodeId = "ns=4;s=C2_DF_IEM_Liner_Rem_Current"
+                    DisplayName = "C"+CorNo.ToString()+"_DF_IEM_Liner_Rem_Current", StartNodeId = "ns=4;s=C"+CorNo.ToString()+"_DF_IEM_Liner_Rem_Current"
                 },
                 new MonitoredItem()
                 {
-                    DisplayName = "C2_DF_IEM_Liner_Rem_Previous", StartNodeId = "ns=4;s=C2_DF_IEM_Liner_Rem_Previous"
+                    DisplayName = "C"+CorNo.ToString()+"_DF_IEM_Liner_Rem_Previous", StartNodeId = "ns=4;s=C"+CorNo.ToString()+"_DF_IEM_Liner_Rem_Previous"
                 },
                 //BM
                 new MonitoredItem()
                 {
-                    DisplayName = "C2_BF_IEM_Medium_Rem_Current", StartNodeId = "ns=4;s=C2_BF_IEM_Medium_Rem_Current"
+                    DisplayName = "C"+CorNo.ToString()+"_BF_IEM_Medium_Rem_Current", StartNodeId = "ns=4;s=C"+CorNo.ToString()+"_BF_IEM_Medium_Rem_Current"
                 },
                 new MonitoredItem()
                 {
-                    DisplayName = "C2_BF_IEM_Medium_Rem_Previous", StartNodeId = "ns=4;s=C2_BF_IEM_Medium_Rem_Previous"
+                    DisplayName = "C"+CorNo.ToString()+"_BF_IEM_Medium_Rem_Previous", StartNodeId = "ns=4;s=C"+CorNo.ToString()+"_BF_IEM_Medium_Rem_Previous"
                 },
                 //BL
                 new MonitoredItem()
                 {
-                    DisplayName = "C2_BF_IEM_Liner_Rem_Current", StartNodeId = "ns=4;s=C2_BF_IEM_Liner_Rem_Current"
+                    DisplayName = "C"+CorNo.ToString()+"_BF_IEM_Liner_Rem_Current", StartNodeId = "ns=4;s=C"+CorNo.ToString()+"_BF_IEM_Liner_Rem_Current"
                 },
                 new MonitoredItem()
                 {
-                    DisplayName = "C2_BF_IEM_Liner_Rem_Previous", StartNodeId = "ns=4;s=C2_BF_IEM_Liner_Rem_Previous"
+                    DisplayName = "C"+CorNo.ToString()+"_BF_IEM_Liner_Rem_Previous", StartNodeId = "ns=4;s=C"+CorNo.ToString()+"_BF_IEM_Liner_Rem_Previous"
                 },
                 //CM
                 new MonitoredItem()
                 {
-                    DisplayName = "C2_CF_IEM_Medium_Rem_Current", StartNodeId = "ns=4;s=C2_CF_IEM_Medium_Rem_Current"
+                    DisplayName = "C"+CorNo.ToString()+"_CF_IEM_Medium_Rem_Current", StartNodeId = "ns=4;s=C"+CorNo.ToString()+"_CF_IEM_Medium_Rem_Current"
                 },
                 new MonitoredItem()
                 {
-                    DisplayName = "C2_CF_IEM_Medium_Rem_Previous", StartNodeId = "ns=4;s=C2_CF_IEM_Medium_Rem_Previous"
+                    DisplayName = "C"+CorNo.ToString()+"_CF_IEM_Medium_Rem_Previous", StartNodeId = "ns=4;s=C"+CorNo.ToString()+"_CF_IEM_Medium_Rem_Previous"
                 },
                 //CL
                 new MonitoredItem()
                 {
-                    DisplayName = "C2_CF_IEM_Liner_Rem_Current", StartNodeId = "ns=4;s=C2_CF_IEM_Liner_Rem_Current"
+                    DisplayName = "C"+CorNo.ToString()+"_CF_IEM_Liner_Rem_Current", StartNodeId = "ns=4;s=C"+CorNo.ToString()+"_CF_IEM_Liner_Rem_Current"
                 },
                 new MonitoredItem()
                 {
-                    DisplayName = "C2_CF_IEM_Liner_Rem_Previous", StartNodeId = "ns=4;s=C2_CF_IEM_Liner_Rem_Previous"
+                    DisplayName = "C"+CorNo.ToString()+"_CF_IEM_Liner_Rem_Previous", StartNodeId = "ns=4;s=C"+CorNo.ToString()+"_CF_IEM_Liner_Rem_Previous"
                 },
             };
             list.ForEach(i => i.Notification += OnNotification);
@@ -398,35 +398,38 @@ namespace NetCoreConsoleClient
                 Console.WriteLine("{0}: {1}, {2}, {3}", item.DisplayName, value.Value, SoruceDateTime, value.StatusCode);
             
                 Int32 Remain = Convert.ToInt32(value.Value.ToString());
-                switch(item.DisplayName){
+                string KeyDisplay = item.DisplayName;
+                int EndIdx = (KeyDisplay.IndexOf(" ") > 0 ? KeyDisplay.IndexOf(" ") : (KeyDisplay.Length-2));
+                KeyDisplay = KeyDisplay.Substring(2, KeyDisplay.Length-2);
+                Console.WriteLine(KeyDisplay);
+                switch(KeyDisplay){
                     //--GL--
-                    case "C2_DF_IEM_Liner_Rem_Current":
+                    case "_DF_IEM_Liner_Rem_Current":
                         { AddSpliceData("GL",Remain,SoruceDateTime); break; }
-                    case "C2_DF_IEM_Liner_Rem_Previous":
+                    case "_DF_IEM_Liner_Rem_Previous":
                         { AddSpliceData("GL",Remain,SoruceDateTime,true); break; }
                     //--BM--
-                    case "C2_BF_IEM_Medium_Rem_Current":
+                    case "_BF_IEM_Medium_Rem_Current":
                         { AddSpliceData("BM",Remain,SoruceDateTime); break; }
-                    case "C2_BF_IEM_Medium_Rem_Previous":
+                    case "_BF_IEM_Medium_Rem_Previous":
                         { AddSpliceData("BM",Remain,SoruceDateTime,true); break; }
                     //--BL--
-                    case "C2_BF_IEM_Liner_Rem_Current":
+                    case "_BF_IEM_Liner_Rem_Current":
                         { AddSpliceData("BL",Remain,SoruceDateTime); break; }
-                    case "C2_BF_IEM_Liner_Rem_Previous":
+                    case "_BF_IEM_Liner_Rem_Previous":
                         { AddSpliceData("BL",Remain,SoruceDateTime,true); break; }
                     //--CM--
-                    case "C2_CF_IEM_Medium_Rem_Current":
+                    case "_CF_IEM_Medium_Rem_Current":
                         { AddSpliceData("CM",Remain,SoruceDateTime); break; }
-                    case "C2_CF_IEM_Medium_Rem_Previous":
+                    case "_CF_IEM_Medium_Rem_Previous":
                         { AddSpliceData("CM",Remain,SoruceDateTime,true); break; }
                     //--CL--
-                    case "C2_CF_IEM_Liner_Rem_Current":
+                    case "_CF_IEM_Liner_Rem_Current":
                         { AddSpliceData("CL",Remain,SoruceDateTime); break; }
-                    case "C2_CF_IEM_Liner_Rem_Previous":
+                    case "_CF_IEM_Liner_Rem_Previous":
                         { AddSpliceData("CL",Remain,SoruceDateTime,true); break; }
                 }
                 LastStamp = SoruceDateTime;
-
             }
         }
 
