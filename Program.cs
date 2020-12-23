@@ -401,7 +401,7 @@ namespace NetCoreConsoleClient
                 string KeyDisplay = item.DisplayName;
                 int EndIdx = (KeyDisplay.IndexOf(" ") > 0 ? KeyDisplay.IndexOf(" ") : (KeyDisplay.Length-2));
                 KeyDisplay = KeyDisplay.Substring(2, KeyDisplay.Length-2);
-                Console.WriteLine(KeyDisplay);
+                // Console.WriteLine(KeyDisplay);
                 switch(KeyDisplay){
                     //--GL--
                     case "_DF_IEM_Liner_Rem_Current":
