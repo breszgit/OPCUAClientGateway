@@ -204,10 +204,19 @@ namespace NetCoreConsoleClient
                 ApplicationType = ApplicationType.Client,
                 ConfigSectionName = Utils.IsRunningOnMono() ? "Opc.Ua.MonoSampleClient" : "Opc.Ua.SampleClient"
             };
-
+            
             // load the application configuration.
-            ApplicationConfiguration config = await application.LoadApplicationConfiguration(false);
-
+                ApplicationConfiguration config = null;
+            try{
+                // load the application configuration.
+                config = await application.LoadApplicationConfiguration(false);
+                WriteLog("Load config");
+            }
+            catch(Exception e){
+                WriteLog("Error!!! Load config. "+e.Message);
+                return;
+            }
+            
             // check the application certificate.
             bool haveAppCertificate = await application.CheckApplicationInstanceCertificate(false, 0);
             if (!haveAppCertificate)
