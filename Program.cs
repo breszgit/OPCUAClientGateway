@@ -225,28 +225,35 @@ namespace NetCoreConsoleClient
             }
             
             WriteLog("Check Certificate");
-            // check the application certificate.
-            bool haveAppCertificate = await application.CheckApplicationInstanceCertificate(false, 0);
-            if (!haveAppCertificate)
-            {
-                WriteLog("Application instance certificate invalid!");
-                throw new Exception("Application instance certificate invalid!");
-            }
-
-            if (haveAppCertificate)
-            {
-                config.ApplicationUri = Utils.GetApplicationUriFromCertificate(config.SecurityConfiguration.ApplicationCertificate.Certificate);
-                if (config.SecurityConfiguration.AutoAcceptUntrustedCertificates)
+            bool haveAppCertificate = false;
+            try{
+                // check the application certificate.
+                haveAppCertificate = await application.CheckApplicationInstanceCertificate(false, 0);
+                if (!haveAppCertificate)
                 {
-                    autoAccept = true;
+                    WriteLog("Application instance certificate invalid!");
+                    throw new Exception("Application instance certificate invalid!");
                 }
-                config.CertificateValidator.CertificateValidation += new CertificateValidationEventHandler(CertificateValidator_CertificateValidation);
+
+                if (haveAppCertificate)
+                {
+                    config.ApplicationUri = Utils.GetApplicationUriFromCertificate(config.SecurityConfiguration.ApplicationCertificate.Certificate);
+                    if (config.SecurityConfiguration.AutoAcceptUntrustedCertificates)
+                    {
+                        autoAccept = true;
+                    }
+                    config.CertificateValidator.CertificateValidation += new CertificateValidationEventHandler(CertificateValidator_CertificateValidation);
+                }
+                else
+                {
+                    Console.WriteLine("    WARN: missing application certificate, using unsecure connection.");
+                    WriteLog("    WARN: missing application certificate, using unsecure connection.");
+                }
             }
-            else
-            {
-                Console.WriteLine("    WARN: missing application certificate, using unsecure connection.");
-                WriteLog("    WARN: missing application certificate, using unsecure connection.");
+            catch(Exception ex){
+                WriteLog("Error!!! Check Certificate"+ex.Message);
             }
+            
 
             Console.WriteLine("2 - Discover endpoints of {0}.", endpointURL);
             WriteLog(string.Format("2 - Discover endpoints of {0}.", endpointURL));
