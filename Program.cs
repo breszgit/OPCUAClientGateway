@@ -132,6 +132,8 @@ namespace NetCoreConsoleClient
         private static List<Splicer> SPCs = new List<Splicer>();
         private static DateTime LastStamp;
         public static dynamic AppConfig;
+        public static string LogPath = "";
+        public static FileStream LogFile = null;
 
         public MySampleClient(string _endpointURL, bool _autoAccept, int _stopTimeout)
         {
@@ -142,6 +144,9 @@ namespace NetCoreConsoleClient
             AppConfig = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(JSConfig);
             CorNo = AppConfig.OPC.CorID;
             ApiURL = AppConfig.OnboardTablet.Server;
+            LogPath = Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName)+"\\Log\\Log_"+DateTime.Now.ToString("yyyyMMdd_HHmmss")+".txt";
+            LogFile = System.IO.File.Create(LogPath);
+            LogFile.Dispose();
         }
 
         public void Run()
@@ -189,6 +194,8 @@ namespace NetCoreConsoleClient
         {
             Console.WriteLine("1 - Create an Application Configuration.");
             exitCode = ExitCode.ErrorCreateApplication;
+            //Write Log
+            WriteLog("Application start on "+DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss"));
 
             ApplicationInstance application = new ApplicationInstance
             {
@@ -401,6 +408,10 @@ namespace NetCoreConsoleClient
                 string KeyDisplay = item.DisplayName;
                 int EndIdx = (KeyDisplay.IndexOf(" ") > 0 ? KeyDisplay.IndexOf(" ") : (KeyDisplay.Length-2));
                 KeyDisplay = KeyDisplay.Substring(2, KeyDisplay.Length-2);
+
+                //Write Log
+                WriteLog("Key:"+KeyDisplay+" Value:"+Remain.ToString());
+
                 // Console.WriteLine(KeyDisplay);
                 switch(KeyDisplay){
                     //--GL--
@@ -495,6 +506,39 @@ namespace NetCoreConsoleClient
 
             
         }
+
+        private static void WriteLog(string Msg){
+            //Write Log
+            using (StreamWriter writer = System.IO.File.AppendText(LogPath))
+            {
+                writer.WriteLine(Msg);
+            }
+        }
+
+        // public static void WriteLog(string Msg){
+        //     FileStream ostrm;
+        //     StreamWriter writer;
+        //     TextWriter oldOut = Console.Out;
+        //     try
+        //     {
+        //         ostrm = new FileStream ("./Redirect.txt", FileMode.OpenOrCreate, FileAccess.Write);
+        //         writer = new StreamWriter (ostrm);
+        //     }
+        //     catch (Exception e)
+        //     {
+        //         Console.WriteLine ("Cannot open Redirect.txt for writing");
+        //         Console.WriteLine (e.Message);
+        //         return;
+        //     }
+        //     Console.SetOut (writer);
+        //     Console.WriteLine ("This is a line of text");
+        //     Console.WriteLine ("Everything written to Console.Write() or");
+        //     Console.WriteLine ("Console.WriteLine() will be written to a file");
+        //     Console.SetOut (oldOut);
+        //     writer.Close();
+        //     ostrm.Close();
+        //     // Console.WriteLine ("Done");
+        // }
 
         #endregion
     }
