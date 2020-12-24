@@ -138,6 +138,7 @@ namespace NetCoreConsoleClient
         public static dynamic AppConfig;
         public static string LogPath = "";
         public static FileStream LogFile = null;
+        private static int AppProcessID = 0;
 
         public MySampleClient(string _endpointURL, bool _autoAccept, int _stopTimeout, string _initLog)
         {
@@ -151,7 +152,9 @@ namespace NetCoreConsoleClient
             LogPath = Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName)+"\\Log\\Log_"+DateTime.Now.ToString("yyyyMMdd_HHmmss")+".txt";
             LogFile = System.IO.File.Create(LogPath);
             LogFile.Dispose();
-            WriteLog(_initLog);
+            WriteLog("Init_Log:"+_initLog);
+            AppProcessID = System.Diagnostics.Process.GetCurrentProcess().Id;
+            UpdateAppProcessID();
         }
 
         public void Run()
@@ -390,7 +393,8 @@ namespace NetCoreConsoleClient
             if (e.Status != null && ServiceResult.IsNotGood(e.Status))
             {
                 Console.WriteLine("{0} {1}/{2}", e.Status, sender.OutstandingRequestCount, sender.DefunctRequestCount);
-
+                WriteLog(string.Format("{0} {1}/{2}", e.Status, sender.OutstandingRequestCount, sender.DefunctRequestCount));
+                
                 if (reconnectHandler == null)
                 {
                     Console.WriteLine("--- RECONNECTING ---");
@@ -489,6 +493,14 @@ namespace NetCoreConsoleClient
 
         
         #region AppEvent
+
+        private static void UpdateAppProcessID(){
+            string URL = ApiURL + "Splicer/UpdateAppProcessID";
+            
+            var resp = ApiClient.CallWebApiwithObject(URL, new {CorNo, AppProcessID});
+
+            Console.WriteLine(resp);
+        }
 
         private static void OnSplice(string MRS, int Remain, int PreviousRemain, DateTime StampRemain, DateTime StampPrevious){
             Console.WriteLine("--Splice Trick ["+MRS+"]--");
