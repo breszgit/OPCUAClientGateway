@@ -499,6 +499,7 @@ namespace NetCoreConsoleClient
             
             var resp = ApiClient.CallWebApiwithObject(URL, new {CorNo, AppProcessID});
 
+            WriteLog(resp);
             Console.WriteLine(resp);
         }
 
