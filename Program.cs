@@ -206,17 +206,19 @@ namespace NetCoreConsoleClient
             };
             
             // load the application configuration.
-                ApplicationConfiguration config = null;
+            ApplicationConfiguration config = null;
+
             try{
-                // load the application configuration.
-                config = await application.LoadApplicationConfiguration(false);
                 WriteLog("Load config");
+                // load the application configuration.
+                config = await application.LoadApplicationConfiguration(false);                
             }
             catch(Exception e){
                 WriteLog("Error!!! Load config. "+e.Message);
                 return;
             }
             
+            WriteLog("Check Certificate");
             // check the application certificate.
             bool haveAppCertificate = await application.CheckApplicationInstanceCertificate(false, 0);
             if (!haveAppCertificate)
@@ -237,6 +239,7 @@ namespace NetCoreConsoleClient
             else
             {
                 Console.WriteLine("    WARN: missing application certificate, using unsecure connection.");
+                WriteLog("    WARN: missing application certificate, using unsecure connection.");
             }
 
             Console.WriteLine("2 - Discover endpoints of {0}.", endpointURL);
