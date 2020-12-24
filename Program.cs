@@ -159,8 +159,8 @@ namespace NetCoreConsoleClient
         {
             try
             {
-                AppProcessID = System.Diagnostics.Process.GetCurrentProcess().Id;
-                UpdateAppProcessID();
+                // AppProcessID = System.Diagnostics.Process.GetCurrentProcess().Id;
+                // UpdateAppProcessID();
                 ConsoleSampleClient().Wait();
             }
             catch (Exception ex)
