@@ -499,8 +499,8 @@ namespace NetCoreConsoleClient
             
             var resp = ApiClient.CallWebApiwithObject(URL, new {CorNo, AppProcessID});
 
-            WriteLog(resp);
-            Console.WriteLine(resp);
+            WriteLog(JsonSerializer.Serialize(resp));
+            // Console.WriteLine(resp);
         }
 
         private static void OnSplice(string MRS, int Remain, int PreviousRemain, DateTime StampRemain, DateTime StampPrevious){
@@ -518,7 +518,7 @@ namespace NetCoreConsoleClient
             
             var resp = ApiClient.CallWebApiwithObject(URL, SPC);
 
-            Console.WriteLine(resp);
+            // Console.WriteLine(resp);
 
         }
 
