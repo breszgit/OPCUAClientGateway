@@ -45,6 +45,8 @@ namespace NetCoreConsoleClient
     public class Program
     {
         public static dynamic AppConfig;
+        public static string _LogStart;
+
         public static int Main(string[] args)
         {
             Console.WriteLine(
@@ -77,6 +79,7 @@ namespace NetCoreConsoleClient
             }
             catch (OptionException e)
             {
+                _LogStart += e.Message + Environment.NewLine;
                 Console.WriteLine(e.Message);
                 showHelp = true;
             }
@@ -110,8 +113,9 @@ namespace NetCoreConsoleClient
                 endpointURL = extraArgs[0];
             }
 
-            MySampleClient client = new MySampleClient(endpointURL, autoAccept, stopTimeout);
+            MySampleClient client = new MySampleClient(endpointURL, autoAccept, stopTimeout, _LogStart);
             client.Run();
+            
 
             return (int)MySampleClient.ExitCode;
         }
@@ -135,7 +139,7 @@ namespace NetCoreConsoleClient
         public static string LogPath = "";
         public static FileStream LogFile = null;
 
-        public MySampleClient(string _endpointURL, bool _autoAccept, int _stopTimeout)
+        public MySampleClient(string _endpointURL, bool _autoAccept, int _stopTimeout, string _initLog)
         {
             endpointURL = _endpointURL;
             autoAccept = _autoAccept;
@@ -147,6 +151,7 @@ namespace NetCoreConsoleClient
             LogPath = Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName)+"\\Log\\Log_"+DateTime.Now.ToString("yyyyMMdd_HHmmss")+".txt";
             LogFile = System.IO.File.Create(LogPath);
             LogFile.Dispose();
+            WriteLog(_initLog);
         }
 
         public void Run()
@@ -159,6 +164,7 @@ namespace NetCoreConsoleClient
             {
                 Utils.Trace("ServiceResultException:" + ex.Message);
                 Console.WriteLine("Exception: {0}", ex.Message);
+                WriteLog("Error!!! Run:"+ex.Message);
                 return;
             }
 
@@ -521,38 +527,13 @@ namespace NetCoreConsoleClient
             
         }
 
-        private static void WriteLog(string Msg){
+        public static void WriteLog(string Msg){
             //Write Log
             using (StreamWriter writer = System.IO.File.AppendText(LogPath))
             {
                 writer.WriteLine(Msg);
             }
         }
-
-        // public static void WriteLog(string Msg){
-        //     FileStream ostrm;
-        //     StreamWriter writer;
-        //     TextWriter oldOut = Console.Out;
-        //     try
-        //     {
-        //         ostrm = new FileStream ("./Redirect.txt", FileMode.OpenOrCreate, FileAccess.Write);
-        //         writer = new StreamWriter (ostrm);
-        //     }
-        //     catch (Exception e)
-        //     {
-        //         Console.WriteLine ("Cannot open Redirect.txt for writing");
-        //         Console.WriteLine (e.Message);
-        //         return;
-        //     }
-        //     Console.SetOut (writer);
-        //     Console.WriteLine ("This is a line of text");
-        //     Console.WriteLine ("Everything written to Console.Write() or");
-        //     Console.WriteLine ("Console.WriteLine() will be written to a file");
-        //     Console.SetOut (oldOut);
-        //     writer.Close();
-        //     ostrm.Close();
-        //     // Console.WriteLine ("Done");
-        // }
 
         #endregion
     }
