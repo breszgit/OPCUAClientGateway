@@ -152,15 +152,15 @@ namespace NetCoreConsoleClient
             LogPath = Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName)+"\\Log\\Log_"+DateTime.Now.ToString("yyyyMMdd_HHmmss")+".txt";
             LogFile = System.IO.File.Create(LogPath);
             LogFile.Dispose();
-            WriteLog("Init_Log:"+_initLog);
-            AppProcessID = System.Diagnostics.Process.GetCurrentProcess().Id;
-            UpdateAppProcessID();
+            WriteLog("Init_Log:"+_initLog);            
         }
 
         public void Run()
         {
             try
             {
+                AppProcessID = System.Diagnostics.Process.GetCurrentProcess().Id;
+                UpdateAppProcessID();
                 ConsoleSampleClient().Wait();
             }
             catch (Exception ex)
