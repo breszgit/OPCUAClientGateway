@@ -212,6 +212,7 @@ namespace NetCoreConsoleClient
             bool haveAppCertificate = await application.CheckApplicationInstanceCertificate(false, 0);
             if (!haveAppCertificate)
             {
+                WriteLog("Application instance certificate invalid!");
                 throw new Exception("Application instance certificate invalid!");
             }
 
@@ -230,6 +231,7 @@ namespace NetCoreConsoleClient
             }
 
             Console.WriteLine("2 - Discover endpoints of {0}.", endpointURL);
+            WriteLog(string.Format("2 - Discover endpoints of {0}.", endpointURL));
             exitCode = ExitCode.ErrorDiscoverEndpoints;
             var selectedEndpoint = CoreClientUtils.SelectEndpoint(endpointURL, haveAppCertificate, 15000);
 			selectedEndpoint.SecurityMode = MessageSecurityMode.None;
@@ -242,7 +244,7 @@ namespace NetCoreConsoleClient
             var endpointConfiguration = EndpointConfiguration.Create(config);
             var endpoint = new ConfiguredEndpoint(null, selectedEndpoint, endpointConfiguration);
             session = await Session.Create(config, endpoint, false, "OPC UA Console Client", 60000, new UserIdentity("adm", "adm"), null);
-
+            WriteLog("3 - Create a session with OPC UA server.");
             // register keep alive handler
             session.KeepAlive += Client_KeepAlive;
 
