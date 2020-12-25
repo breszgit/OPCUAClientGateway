@@ -139,6 +139,7 @@ namespace NetCoreConsoleClient
         public static string LogPath = "";
         public static FileStream LogFile = null;
         private static int AppProcessID = 0;
+        private static bool DisableLog = false;
 
         public MySampleClient(string _endpointURL, bool _autoAccept, int _stopTimeout, string _initLog)
         {
@@ -149,9 +150,17 @@ namespace NetCoreConsoleClient
             AppConfig = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(JSConfig);
             CorNo = AppConfig.OPC.CorID;
             ApiURL = AppConfig.OnboardTablet.Server;
-            LogPath = Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName)+"\\Log\\Log_"+DateTime.Now.ToString("yyyyMMdd_HHmmss")+".txt";
-            LogFile = System.IO.File.Create(LogPath);
-            LogFile.Dispose();
+            
+            if(DisableLog == false){
+                string LogFolder = Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName)+"\\Log";
+                if(!System.IO.Directory.Exists(LogFolder)){
+                    System.IO.Directory.CreateDirectory(LogFolder);
+                }
+                LogPath = LogFolder+"\\Log_"+DateTime.Now.ToString("yyyyMMdd_HHmmss")+".txt";
+                LogFile = System.IO.File.Create(LogPath);
+                LogFile.Dispose();
+            }
+            
             WriteLog("Init_Log:"+_initLog);            
         }
 
@@ -159,8 +168,9 @@ namespace NetCoreConsoleClient
         {
             try
             {
-                // AppProcessID = System.Diagnostics.Process.GetCurrentProcess().Id;
-                // UpdateAppProcessID();
+                AppProcessID = System.Diagnostics.Process.GetCurrentProcess().Id;
+                // Console.WriteLine(AppProcessID.ToString());
+                UpdateAppProcessID();
                 ConsoleSampleClient().Wait();
             }
             catch (Exception ex)
@@ -495,12 +505,11 @@ namespace NetCoreConsoleClient
         #region AppEvent
 
         private static void UpdateAppProcessID(){
-            string URL = ApiURL + "Splicer/UpdateAppProcessID";
+            string URL = string.Format("{0}{1}?CorID={2}&AppProcessID={3}",ApiURL,"Splicer/UpdateAppProcessID",CorNo,AppProcessID);
             
-            var resp = ApiClient.CallWebApiwithObject(URL, new {CorNo, AppProcessID});
+            var resp = ApiClient.CallWebApiwithObject(URL, null);
 
-            WriteLog(JsonSerializer.Serialize(resp));
-            // Console.WriteLine(resp);
+            WriteLog("Update AppProceID:"+resp.Data.ToString());
         }
 
         private static void OnSplice(string MRS, int Remain, int PreviousRemain, DateTime StampRemain, DateTime StampPrevious){
@@ -548,6 +557,9 @@ namespace NetCoreConsoleClient
         }
 
         public static void WriteLog(string Msg){
+            if(DisableLog == true)
+                return;
+
             //Write Log
             using (StreamWriter writer = System.IO.File.AppendText(LogPath))
             {

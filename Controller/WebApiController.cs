@@ -19,9 +19,10 @@ namespace Splicer_OPCUA.Controllers
             HttpResponseMessage response = null;
             Task.Run(() => {
                 response = client.PostAsync(url, content).Result;
-            });
+            }).Wait();
             
-            // var response = await client.PostAsync(url, content);
+            var _resp = response.Content.ReadAsStringAsync();
+            result = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(_resp.Result);
 
             return result;
         } 
