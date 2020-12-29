@@ -140,6 +140,9 @@ namespace NetCoreConsoleClient
         public static FileStream LogFile = null;
         private static int AppProcessID = 0;
         private static bool DisableLog = false;
+        private static DateTime LastSync;
+        private static double MinUpdateSec = 10;
+
 
         public MySampleClient(string _endpointURL, bool _autoAccept, int _stopTimeout, string _initLog)
         {
@@ -150,7 +153,10 @@ namespace NetCoreConsoleClient
             AppConfig = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(JSConfig);
             CorNo = AppConfig.OPC.CorID;
             ApiURL = AppConfig.OnboardTablet.Server;
-            
+            DisableLog = AppConfig.Setting.DisableLog;
+            MinUpdateSec = AppConfig.Setting.MinUpdateSec;
+            LastSync = DateTime.Now;
+
             if(DisableLog == false){
                 string LogFolder = Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName)+"\\Log";
                 if(!System.IO.Directory.Exists(LogFolder)){
@@ -169,8 +175,8 @@ namespace NetCoreConsoleClient
             try
             {
                 AppProcessID = System.Diagnostics.Process.GetCurrentProcess().Id;
-                // Console.WriteLine(AppProcessID.ToString());
                 UpdateAppProcessID();
+
                 ConsoleSampleClient().Wait();
             }
             catch (Exception ex)
@@ -427,6 +433,8 @@ namespace NetCoreConsoleClient
             reconnectHandler = null;
 
             Console.WriteLine("--- RECONNECTED ---");
+
+            WriteLog("Reconnected");
         }
 
         private static void OnNotification(MonitoredItem item, MonitoredItemNotificationEventArgs e)
@@ -453,7 +461,6 @@ namespace NetCoreConsoleClient
                 //Write Log
                 WriteLog("Key:"+KeyDisplay+" Value:"+Remain.ToString());
 
-                // Console.WriteLine(KeyDisplay);
                 switch(KeyDisplay){
                     //--GL--
                     case "_DF_IEM_Liner_Rem_Current":
@@ -482,6 +489,12 @@ namespace NetCoreConsoleClient
                         { AddSpliceData("CL",Remain,SoruceDateTime,true); break; }
                 }
                 LastStamp = SoruceDateTime;
+
+                var DiffSync = (DateTime.Now - LastSync).TotalSeconds;
+                if(DiffSync > MinUpdateSec){
+                    SyncLastData();
+                    LastSync = DateTime.Now;
+                }
             }
         }
 
@@ -528,7 +541,6 @@ namespace NetCoreConsoleClient
             var resp = ApiClient.CallWebApiwithObject(URL, SPC);
 
             // Console.WriteLine(resp);
-
         }
 
         private static void AddSpliceData(string MRS, int Remain, DateTime Stamp, bool IsPrevious = false){
@@ -536,7 +548,8 @@ namespace NetCoreConsoleClient
             if(_SPC == null){
                 _SPC = new Splicer(){
                     Mrs = MRS,
-                    CorNo = CorNo
+                    CorNo = CorNo,
+                    LastUpdate = DateTime.Now
                 };                
                 SPCs.Add(_SPC);
             }
@@ -544,16 +557,21 @@ namespace NetCoreConsoleClient
             if(IsPrevious != true){
                 _SPC.Remain = Remain;
                 _SPC.StampRemain = Stamp;
+                _SPC.LastUpdate = DateTime.Now;
             }
             else{
                 _SPC.PreviousRemain = Remain;
                 _SPC.StampPreviousRemain = Stamp;
+                _SPC.LastUpdate = DateTime.Now;
                 OnSplice(_SPC.Mrs, _SPC.Remain.Value, _SPC.PreviousRemain.Value, _SPC.StampRemain.Value, _SPC.StampPreviousRemain.Value);
-                // var Log = JsonSerializer.Serialize(SPCs);
-                // Console.WriteLine(Log);
             }
+        }
 
-            
+        private static void SyncLastData(){
+            var _SPC = SPCs.OrderByDescending(x => x.LastUpdate).FirstOrDefault();
+            if(_SPC != null){
+                OnSplice(_SPC.Mrs, _SPC.Remain.Value, _SPC.PreviousRemain.Value, _SPC.StampRemain.Value, _SPC.StampPreviousRemain.Value);
+            }
         }
 
         public static void WriteLog(string Msg){
@@ -568,5 +586,6 @@ namespace NetCoreConsoleClient
         }
 
         #endregion
+    
     }
 }
