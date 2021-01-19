@@ -142,7 +142,7 @@ namespace NetCoreConsoleClient
         private static bool DisableLog = false;
         private static DateTime LastSync;
         private static double MinUpdateSec = 10;
-
+        private static DateTime TimeToCreateLogFile;
 
         public MySampleClient(string _endpointURL, bool _autoAccept, int _stopTimeout, string _initLog)
         {
@@ -165,6 +165,7 @@ namespace NetCoreConsoleClient
                 LogPath = LogFolder+"\\Log_"+DateTime.Now.ToString("yyyyMMdd_HHmmss")+".txt";
                 LogFile = System.IO.File.Create(LogPath);
                 LogFile.Dispose();
+                TimeToCreateLogFile = DateTime.Now.AddHours(24);
             }
             
             WriteLog("Init_Log:"+_initLog);            
@@ -578,11 +579,33 @@ namespace NetCoreConsoleClient
             if(DisableLog == true)
                 return;
 
+            //Create New Log File
+            if(DateTime.Now > TimeToCreateLogFile)
+                CreateLogFile();
+
             //Write Log
             using (StreamWriter writer = System.IO.File.AppendText(LogPath))
             {
                 writer.WriteLine(Msg);
             }
+        }
+
+        public static void CreateLogFile(){
+            string LogFolder = Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName)+"\\Log";
+            if(!System.IO.Directory.Exists(LogFolder)){
+                System.IO.Directory.CreateDirectory(LogFolder);
+            }
+
+            DirectoryInfo DirInfo = new DirectoryInfo(LogFolder);
+            FileInfo[] filesInDir = DirInfo.GetFiles("*Log_" + DateTime.Now.ToString("yyyyMMdd") + "*.*");
+            if(filesInDir.Length > 0)
+                return;
+
+            LogPath = LogFolder+"\\Log_"+DateTime.Now.ToString("yyyyMMdd_HHmmss")+".txt";
+            LogFile = System.IO.File.Create(LogPath);
+            LogFile.Dispose();
+            TimeToCreateLogFile = DateTime.Now.AddHours(24);
+
         }
 
         #endregion
