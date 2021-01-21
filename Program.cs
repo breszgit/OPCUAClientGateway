@@ -530,10 +530,13 @@ namespace NetCoreConsoleClient
             WriteLog("Update AppProceID:"+resp.Data.ToString());
         }
 
-        private static void OnSplice(string MRS, int Remain, int PreviousRemain, DateTime StampRemain, DateTime StampPrevious){
+        private static void OnSplice(string MRS, int Remain, int PreviousRemain, DateTime StampRemain, DateTime StampPrevious, bool Syncing = false){
             // Console.WriteLine("--Splice Trick ["+MRS+"]--");
-            string _Log = string.Format("***[{0}]CutLength:{1} On:{2:dd/MM/yyyy HH:mm:ss}***",MRS,PreviousRemain,StampPrevious);
-            WriteLog(_Log);
+            if(Syncing == false){
+                string _Log = string.Format("***[{0}]CutLength:{1} On:{2:dd/MM/yyyy HH:mm:ss}***",MRS,PreviousRemain,StampPrevious);
+                WriteLog(_Log);
+            }
+            
             Splicer SPC = new Splicer(){
                 Mrs = MRS,
                 CorNo = CorNo,
@@ -575,9 +578,17 @@ namespace NetCoreConsoleClient
         }
 
         private static void SyncLastData(){
-            var _SPC = SPCs.OrderByDescending(x => x.LastUpdate).FirstOrDefault();
+            var _SPC = SPCs.Where(x => x.Status != 1).OrderByDescending(x => x.LastUpdate).FirstOrDefault();
             if(_SPC != null){
-                OnSplice(_SPC.Mrs, _SPC.Remain.Value, _SPC.PreviousRemain.Value, _SPC.StampRemain.Value, _SPC.StampPreviousRemain.Value);
+                OnSplice(_SPC.Mrs, _SPC.Remain.Value, _SPC.PreviousRemain.Value, _SPC.StampRemain.Value, _SPC.StampPreviousRemain.Value, true);
+                _SPC.Status = 1;
+
+                var CNTStaus1 = SPCs.Where(x => x.Status == 1).Count();
+                if(CNTStaus1 == SPCs.Count()){
+                    foreach(Splicer SC in SPCs){
+                        SC.Status = 0;
+                    }
+                }
             }
         }
 
