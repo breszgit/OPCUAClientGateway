@@ -144,6 +144,7 @@ namespace NetCoreConsoleClient
         private static double MinUpdateSec = 10;
         private static DateTime TimeToCreateLogFile;
         private static DateTime StampLog;
+        private static int LogSplitHour;
 
         public MySampleClient(string _endpointURL, bool _autoAccept, int _stopTimeout, string _initLog)
         {
@@ -157,6 +158,7 @@ namespace NetCoreConsoleClient
             DisableLog = AppConfig.Setting.DisableLog;
             MinUpdateSec = AppConfig.Setting.MinUpdateSec;
             LastSync = DateTime.Now;
+            LogSplitHour = AppConfig.Setting.LogSplitHour;
 
             if(DisableLog == false){
                 string LogFolder = Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName)+"\\Log";
@@ -166,7 +168,7 @@ namespace NetCoreConsoleClient
                 LogPath = LogFolder+"\\Log_"+DateTime.Now.ToString("yyyyMMdd_HHmmss")+".txt";
                 LogFile = System.IO.File.Create(LogPath);
                 LogFile.Dispose();
-                TimeToCreateLogFile = DateTime.Now.AddHours(24);
+                TimeToCreateLogFile = DateTime.Now.AddHours(LogSplitHour);
             }
             
             WriteLog("Init_Log:"+_initLog);            
@@ -605,8 +607,26 @@ namespace NetCoreConsoleClient
             LogPath = LogFolder+"\\Log_"+DateTime.Now.ToString("yyyyMMdd_HHmmss")+".txt";
             LogFile = System.IO.File.Create(LogPath);
             LogFile.Dispose();
-            TimeToCreateLogFile = DateTime.Now.AddHours(24);
+            TimeToCreateLogFile = DateTime.Now.AddHours(LogSplitHour);
 
+            RemoveOldLogFile();
+        }
+
+        public static void RemoveOldLogFile(){
+            string LogFolder = Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName)+"\\Log";
+            if(!System.IO.Directory.Exists(LogFolder))
+                return;
+
+            DirectoryInfo DirInfo = new DirectoryInfo(LogFolder);
+            FileInfo[] filesInDir = DirInfo.GetFiles("*Log_*.*");
+            if(filesInDir.Length > 0){
+                for(int i = filesInDir.Length-1; i > 0; i--){
+                    FileInfo FIO = filesInDir[i];
+                    if(FIO.LastWriteTime < DateTime.Now.AddDays(-7)){
+                        FIO.Delete();
+                    }
+                }
+            }
         }
 
         #endregion
