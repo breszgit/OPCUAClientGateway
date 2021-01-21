@@ -143,6 +143,7 @@ namespace NetCoreConsoleClient
         private static DateTime LastSync;
         private static double MinUpdateSec = 10;
         private static DateTime TimeToCreateLogFile;
+        private static DateTime StampLog;
 
         public MySampleClient(string _endpointURL, bool _autoAccept, int _stopTimeout, string _initLog)
         {
@@ -443,15 +444,14 @@ namespace NetCoreConsoleClient
             //Set Default Reginal
             Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("th-TH");
             System.Globalization.CultureInfo _cultureTH = new System.Globalization.CultureInfo("th-TH", true);
-            WriteLog(string.Format("-----{0}-----",DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss")));
             foreach (var value in item.DequeueValues())
             {
-                
                 // Console.WriteLine(TimeZone.CurrentTimeZone);
                 // Console.WriteLine("{0}: {1}, {2}, {3}", item.DisplayName, value.Value, value.SourceTimestamp, value.StatusCode);
                 DateTime SoruceDateTime = value.SourceTimestamp.AddHours(7); //Update TimeZone
                 if(LastStamp != SoruceDateTime){
                     Console.WriteLine("-----------------------------------");
+                    WriteLog(string.Format("-----{0}-----",DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss")));
                 }
                 Console.WriteLine("{0}: {1}, {2}, {3}", item.DisplayName, value.Value, SoruceDateTime, value.StatusCode);
             
