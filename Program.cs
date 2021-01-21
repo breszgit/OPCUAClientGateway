@@ -443,6 +443,7 @@ namespace NetCoreConsoleClient
             //Set Default Reginal
             Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("th-TH");
             System.Globalization.CultureInfo _cultureTH = new System.Globalization.CultureInfo("th-TH", true);
+            WriteLog(string.Format("-----{0}-----",DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss")));
             foreach (var value in item.DequeueValues())
             {
                 
