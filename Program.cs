@@ -171,7 +171,8 @@ namespace NetCoreConsoleClient
                 TimeToCreateLogFile = DateTime.Now.AddHours(LogSplitHour);
             }
             
-            WriteLog("Init_Log:"+_initLog);            
+            WriteLog("Init_Log:"+_initLog);           
+            RemoveOldLogFile(); 
         }
 
         public void Run()
@@ -530,7 +531,8 @@ namespace NetCoreConsoleClient
         }
 
         private static void OnSplice(string MRS, int Remain, int PreviousRemain, DateTime StampRemain, DateTime StampPrevious){
-            Console.WriteLine("--Splice Trick ["+MRS+"]--");
+            // Console.WriteLine("--Splice Trick ["+MRS+"]--");
+            string _Log = string.Format("***[{0}]CutLength:{1} On:{2:dd/MM/yyyy HH:mm:ss}***",MRS,PreviousRemain,StampPrevious);
             Splicer SPC = new Splicer(){
                 Mrs = MRS,
                 CorNo = CorNo,
