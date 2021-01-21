@@ -533,6 +533,7 @@ namespace NetCoreConsoleClient
         private static void OnSplice(string MRS, int Remain, int PreviousRemain, DateTime StampRemain, DateTime StampPrevious){
             // Console.WriteLine("--Splice Trick ["+MRS+"]--");
             string _Log = string.Format("***[{0}]CutLength:{1} On:{2:dd/MM/yyyy HH:mm:ss}***",MRS,PreviousRemain,StampPrevious);
+            WriteLog(_Log);
             Splicer SPC = new Splicer(){
                 Mrs = MRS,
                 CorNo = CorNo,
