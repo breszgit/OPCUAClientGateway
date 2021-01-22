@@ -671,8 +671,8 @@ namespace NetCoreConsoleClient
         }
 
         public static void RemoveOldLogFile(){
-            // string LogFolder = Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName)+"\\Log";
-            string LogFolder = @"D:\VSCode\Splicer_OPCUA\bin\Debug\netcoreapp3.1\Log";
+            string LogFolder = Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName)+"\\Log";
+            // string LogFolder = @"D:\VSCode\Splicer_OPCUA\bin\Debug\netcoreapp3.1\Log";
             if(!System.IO.Directory.Exists(LogFolder))
                 return;
 
