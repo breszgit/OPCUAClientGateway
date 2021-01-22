@@ -12,5 +12,6 @@ namespace Splicer_OPCUA.Model
         public DateTime? StampPreviousRemain { get; set; }
         public int? Status { get; set; }
         public DateTime? LastUpdate { get; set; }
+        public int? Speed { get; set; }
     }
 }

@@ -143,7 +143,6 @@ namespace NetCoreConsoleClient
         private static DateTime LastSync;
         private static double MinUpdateSec = 10;
         private static DateTime TimeToCreateLogFile;
-        private static DateTime StampLog;
         private static int LogSplitHour;
 
         public MySampleClient(string _endpointURL, bool _autoAccept, int _stopTimeout, string _initLog)
@@ -158,7 +157,7 @@ namespace NetCoreConsoleClient
             DisableLog = AppConfig.Setting.DisableLog;
             MinUpdateSec = AppConfig.Setting.MinUpdateSec;
             LastSync = DateTime.Now;
-            LogSplitHour = AppConfig.Setting.LogSplitHour;
+            LogSplitHour = AppConfig.Setting.LogSplitHour; 
 
             if(DisableLog == false){
                 string LogFolder = Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName)+"\\Log";
@@ -171,8 +170,9 @@ namespace NetCoreConsoleClient
                 TimeToCreateLogFile = DateTime.Now.AddHours(LogSplitHour);
             }
             
-            WriteLog("Init_Log:"+_initLog);           
-            RemoveOldLogFile(); 
+            WriteLog("Init_Log:"+_initLog);    
+            RemoveOldLogFile();       
+            
         }
 
         public void Run()
@@ -347,10 +347,6 @@ namespace NetCoreConsoleClient
             Console.WriteLine("6 - Add a list of items (server current time and status) to the subscription.");
             exitCode = ExitCode.ErrorMonitoredItem;
             var list = new List<MonitoredItem> {
-                // new MonitoredItem(subscription.DefaultItem)
-                // {
-                //     DisplayName = "ServerStatusCurrentTime", StartNodeId = "i="+Variables.Server_ServerStatus_CurrentTime.ToString()
-                // },
                 //GL
                 new MonitoredItem()
                 {
@@ -395,6 +391,19 @@ namespace NetCoreConsoleClient
                 new MonitoredItem()
                 {
                     DisplayName = "C"+CorNo.ToString()+"_CF_IEM_Liner_Rem_Previous", StartNodeId = "ns=4;s=C"+CorNo.ToString()+"_CF_IEM_Liner_Rem_Previous"
+                },
+                //Speed
+                new MonitoredItem()
+                {
+                    DisplayName = "C"+CorNo.ToString()+"_DF_IEM_DF_Speed", StartNodeId = "ns=4;s=C"+CorNo.ToString()+"_DF_IEM_DF_Speed"
+                },
+                new MonitoredItem()
+                {
+                    DisplayName = "C"+CorNo.ToString()+"_BF_IEM_B_Speed", StartNodeId = "ns=4;s=C"+CorNo.ToString()+"_BF_IEM_B_Speed"
+                },
+                new MonitoredItem()
+                {
+                    DisplayName = "C"+CorNo.ToString()+"_CF_IEM_C_Speed", StartNodeId = "ns=4;s=C"+CorNo.ToString()+"_CF_IEM_C_Speed"
                 },
             };
             list.ForEach(i => i.Notification += OnNotification);
@@ -454,7 +463,8 @@ namespace NetCoreConsoleClient
                 DateTime SoruceDateTime = value.SourceTimestamp.AddHours(7); //Update TimeZone
                 if(LastStamp != SoruceDateTime){
                     Console.WriteLine("-----------------------------------");
-                    WriteLog(string.Format("-----{0}-----",DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss")));
+                    WriteLog(string.Format("-----{0} Speed:{1}-----",DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss"), GetMRSAvgSpeed() ));
+                    
                 }
                 Console.WriteLine("{0}: {1}, {2}, {3}", item.DisplayName, value.Value, SoruceDateTime, value.StatusCode);
             
@@ -492,6 +502,13 @@ namespace NetCoreConsoleClient
                         { AddSpliceData("CL",Remain,SoruceDateTime); break; }
                     case "_CF_IEM_Liner_Rem_Previous":
                         { AddSpliceData("CL",Remain,SoruceDateTime,true); break; }
+                    //--Speed--
+                    case "_DF_IEM_DF_Spee":
+                        { UpdateMRSSpeed("G", Convert.ToInt32(value.Value.ToString())); break;}
+                    case "_BF_IEM_B_Speed":
+                        { UpdateMRSSpeed("B", Convert.ToInt32(value.Value.ToString())); break;}
+                    case "_CF_IEM_C_Speed":
+                        { UpdateMRSSpeed("C", Convert.ToInt32(value.Value.ToString())); break;}
                 }
                 LastStamp = SoruceDateTime;
 
@@ -577,6 +594,32 @@ namespace NetCoreConsoleClient
             }
         }
 
+        private static void UpdateMRSSpeed(string MRSKey, int Speed){
+            var _SPCs = SPCs.Where(x => x.Mrs.StartsWith(MRSKey)).ToList();
+            if(_SPCs != null && _SPCs.Count > 0){
+                foreach(var _SPC in _SPCs){
+                    _SPC.Speed = Speed;
+                }
+            }
+
+            int MRSSpeed = GetMRSAvgSpeed();
+            if(MRSSpeed == 0)
+                WriteLog("***MRS not working!!! Speed:0***");            
+        }
+
+        private static int GetMRSAvgSpeed(){
+            int Speed = 0;
+            try{
+                if(SPCs.Count > 0){
+                    Speed = Convert.ToInt32(SPCs.Average(x => x.Speed));
+                }
+            }
+            catch(Exception e){
+                WriteLog("GetMRSSpeed Error!!"+e.Message);
+            }
+            return Speed;
+        }
+
         private static void SyncLastData(){
             var _SPC = SPCs.Where(x => x.Status != 1).OrderByDescending(x => x.LastUpdate).FirstOrDefault();
             if(_SPC != null){
@@ -627,14 +670,15 @@ namespace NetCoreConsoleClient
         }
 
         public static void RemoveOldLogFile(){
-            string LogFolder = Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName)+"\\Log";
+            // string LogFolder = Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName)+"\\Log";
+            string LogFolder = @"D:\VSCode\Splicer_OPCUA\bin\Debug\netcoreapp3.1\Log";
             if(!System.IO.Directory.Exists(LogFolder))
                 return;
 
             DirectoryInfo DirInfo = new DirectoryInfo(LogFolder);
             FileInfo[] filesInDir = DirInfo.GetFiles("*Log_*.*");
             if(filesInDir.Length > 0){
-                for(int i = filesInDir.Length-1; i > 0; i--){
+                for(int i = filesInDir.Length-1; i >= 0; i--){
                     FileInfo FIO = filesInDir[i];
                     if(FIO.LastWriteTime < DateTime.Now.AddDays(-7)){
                         FIO.Delete();
