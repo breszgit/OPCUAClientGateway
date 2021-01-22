@@ -671,21 +671,27 @@ namespace NetCoreConsoleClient
         }
 
         public static void RemoveOldLogFile(){
-            string LogFolder = Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName)+"\\Log";
-            // string LogFolder = @"D:\VSCode\Splicer_OPCUA\bin\Debug\netcoreapp3.1\Log";
-            if(!System.IO.Directory.Exists(LogFolder))
-                return;
+            string LogFolder = "";
+            try{
+                LogFolder = Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName)+"\\Log";
+                if(!System.IO.Directory.Exists(LogFolder))
+                    return;
 
-            DirectoryInfo DirInfo = new DirectoryInfo(LogFolder);
-            FileInfo[] filesInDir = DirInfo.GetFiles("*Log_*.*");
-            if(filesInDir.Length > 0){
-                for(int i = filesInDir.Length-1; i >= 0; i--){
-                    FileInfo FIO = filesInDir[i];
-                    if(FIO.LastWriteTime < DateTime.Now.AddDays(-7)){
-                        FIO.Delete();
+                DirectoryInfo DirInfo = new DirectoryInfo(LogFolder);
+                FileInfo[] filesInDir = DirInfo.GetFiles("*Log_*.*");
+                if(filesInDir.Length > 0){
+                    for(int i = filesInDir.Length-1; i >= 0; i--){
+                        FileInfo FIO = filesInDir[i];
+                        if(FIO.LastWriteTime < DateTime.Now.AddDays(-7)){
+                            FIO.Delete();
+                        }
                     }
                 }
             }
+            catch(Exception ex){
+                WriteLog("RemoveLog Error!!! Path:"+ LogFolder +" "+ex.Message);
+            }
+            
         }
 
         #endregion
