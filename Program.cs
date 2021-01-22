@@ -610,8 +610,9 @@ namespace NetCoreConsoleClient
         private static int GetMRSAvgSpeed(){
             int Speed = 0;
             try{
+                string[] MrsMain = new string[] { "GL","BL", "CL" };
                 if(SPCs.Count > 0){
-                    Speed = Convert.ToInt32(SPCs.Average(x => x.Speed));
+                    Speed = Convert.ToInt32(SPCs.Where(x => x.Speed > 0 && MrsMain.Contains(x.Mrs) ).Average(x => x.Speed));
                 }
             }
             catch(Exception e){
