@@ -4,9 +4,9 @@ using System.Text.Json;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Splicer_OPCUA.Controllers
+namespace OPCUAClientGateway.Class
 {
-    public class WebApiController
+    public class WebApiClientClass
     {
         private readonly HttpClient client = new HttpClient();
 
@@ -27,5 +27,4 @@ namespace Splicer_OPCUA.Controllers
             return result;
         } 
     }
-    // private static readonly HttpClient client = new HttpClient();
 }
