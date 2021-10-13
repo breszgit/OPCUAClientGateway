@@ -312,6 +312,7 @@ namespace OPCUAClientGateway.Class
             //Set Default Reginal
             Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("th-TH");
             System.Globalization.CultureInfo _cultureTH = new System.Globalization.CultureInfo("th-TH", true);
+            MonitoredItem _item = item;
             foreach (var value in item.DequeueValues())
             {
                 DateTime SoruceDateTime = value.SourceTimestamp.AddHours(7); //Update TimeZone
@@ -321,10 +322,8 @@ namespace OPCUAClientGateway.Class
                     
                 }
                 Console.WriteLine("{0}: {1}, {2}, {3}", item.DisplayName, value.Value, SoruceDateTime, value.StatusCode);
-            
-                string KeyDisplay = item.DisplayName;
-                // int EndIdx = (KeyDisplay.IndexOf(" ") > 0 ? KeyDisplay.IndexOf(" ") : (KeyDisplay.Length-2));
-                // KeyDisplay = KeyDisplay.Substring(2, KeyDisplay.Length-2);                
+                
+                string KeyDisplay = _item.DisplayName;            
 
                 //Write Log
                 WriteLog("Key:"+KeyDisplay+" Value:"+value.Value.ToString());
