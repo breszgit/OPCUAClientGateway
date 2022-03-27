@@ -323,7 +323,8 @@ namespace OPCUAClientGateway.Class
                 }
                 Console.WriteLine("{0}: {1}, {2}, {3}", item.DisplayName, value.Value, SoruceDateTime, value.StatusCode);
                 
-                string KeyDisplay = _item.DisplayName;            
+                // string KeyDisplay = _item.DisplayName;
+                string KeyDisplay = GetRealKeyDisplay(_item.StartNodeId);
 
                 //Write Log
                 WriteLog("Key:"+KeyDisplay+" Value:"+value.Value.ToString());
@@ -455,6 +456,17 @@ namespace OPCUAClientGateway.Class
         #endregion
 
         #region AppEvent        
+        public static string GetRealKeyDisplay(NodeId _NID){
+            string result = "";
+            try{
+                result = TagLists.Find(f => f.StartNodeId == _NID.ToString()).DisplayName;
+            }
+            catch(Exception ex){
+                Console.WriteLine("Can't get KeyTag of {0}. {1}", _NID.ToString(), ex.Message);
+            }            
+            return result;
+        }
+
         public static void WriteLog(string Msg){
             if(DisableLog == true)
                 return;
